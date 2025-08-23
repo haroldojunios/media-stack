@@ -1,0 +1,97 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    ports:
+      - "8096:8096" # Web UI (http)
+      - "8920:8920" # HTTPS (optional, requires certs)
+    volumes:
+      - ./jellyfin:/config
+      - /torrent:/torrent
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK_SET=022
+      - TZ=America/Sao_Paulo
+      - WEBUI_PORT=9000
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
+    volumes:
+      - ./qbittorrent:/config
+      - /torrent:/torrent
+    ports:
+      - "9000:9000" # Web UI (Vuetorrent)
+      - "6881:6881" # Torrent TCP
+      - "6881:6881/udp" # Torrent UDP
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - ./sonarr:/config
+      - /torrent:/torrent
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
+    depends_on:
+      - qbittorrent
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - ./prowlarr:/config
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
+    depends_on:
+      - flaresolverr
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=America/Sao_Paulo
+    ports:
+      - "8191:8191"
+    restart: unless-stopped
+
+  backup:
+    build:
+      context: ./backup
+      dockerfile: ./Dockerfile
+    container_name: backup
+    volumes:
+      - .:/data # Entire media stack folder
+      - ./backups:/backups # Local backup storage (excluded from archive)
+      - ./backup/backup.sh:/root/backup.sh:ro
+      - ~/.config/rclone:/root/.config/rclone
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+
+networks:
+  default:
+    name: media-stack
+    driver: bridge

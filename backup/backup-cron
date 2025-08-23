@@ -1,0 +1,2 @@
+# Run backup every day at 3 AM
+0 3 * * * /root/backup.sh > /proc/1/fd/1 2>&1
