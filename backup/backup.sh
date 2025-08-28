@@ -8,7 +8,7 @@ echo "[INFO] Starting backup at $(date)"
 
 # Compress entire docker folder but exclude the local backup storage
 cd /data
-tar -cf - . --exclude='./backups' | lrzip -o "$DEST"
+tar -cf - . --exclude='./backups' --exclude='./jellyfin/data/metadata' --exclude='./jellyfin/data/data/attachments' --exclude='./jellyfin/cache' | lrzip -o "$DEST"
 
 echo "[INFO] Backup created: $DEST"
 
