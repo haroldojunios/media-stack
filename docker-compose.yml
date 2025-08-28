@@ -15,6 +15,9 @@ services:
       - TZ=America/Sao_Paulo
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=all
+    runtime: nvidia
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -34,6 +37,8 @@ services:
       - "6881:6881" # Torrent TCP
       - "6881:6881/udp" # Torrent UDP
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -50,6 +55,8 @@ services:
     restart: unless-stopped
     depends_on:
       - qbittorrent
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -65,6 +72,8 @@ services:
     restart: unless-stopped
     depends_on:
       - flaresolverr
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -77,6 +86,8 @@ services:
     ports:
       - "8191:8191"
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   backup:
     build:
@@ -90,6 +101,17 @@ services:
       - ~/.config/rclone:/root/.config/rclone
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
+      - WATCHTOWER_LABEL_ENABLE=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup --interval 3600
 
 networks:
   default:
