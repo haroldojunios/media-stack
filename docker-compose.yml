@@ -89,6 +89,17 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
+  renamarr:
+    container_name: renamarr
+    image: ghcr.io/hollanbm/renamarr:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
+    volumes:
+      - ./renamarr/config.yml:/config/config.yml:ro
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
   backup:
     build:
       context: ./backup
