@@ -89,6 +89,21 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=America/Sao_Paulo
+      - PORT=5055 #optional
+    ports:
+      - 5055:5055
+    volumes:
+      - ./jellyseerr:/app/config
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
   renamarr:
     container_name: renamarr
     image: ghcr.io/hollanbm/renamarr:latest
