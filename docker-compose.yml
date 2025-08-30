@@ -104,6 +104,26 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
+  calendarr:
+    image: ghcr.io/jordanlambrecht/calendarr:latest
+    restart: "unless-stopped"
+    container_name: calendarr
+    environment:
+      USE_DISCORD: "true"
+      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL} # Reference the .env.example for more info
+      CALENDAR_URLS: >
+        [{
+          "url":"${ICS_URL_SONARR_1}",
+          "type":"tv"
+        }]
+      TZ: "America/Sao_Paulo" # Change to your timezone
+      SCHEDULE_TYPE: "WEEKLY" # Or "DAILY"
+      RUN_TIME: "09:00" # Time to run the job (HH:MM)
+    volumes:
+      - ./calendarr/logs:/app/logs:rw
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
   renamarr:
     container_name: renamarr
     image: ghcr.io/hollanbm/renamarr:latest
