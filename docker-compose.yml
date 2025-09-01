@@ -58,6 +58,24 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - ./radarr:/config
+      - /torrent:/torrent
+    ports:
+      - "7878:7878"
+    restart: unless-stopped
+    depends_on:
+      - qbittorrent
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
