@@ -28,7 +28,8 @@ services:
       - UMASK_SET=022
       - TZ=America/Sao_Paulo
       - WEBUI_PORT=9000
-      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
+      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:vuetorrent
+      - TP_COMMUNITY_THEME=catppuccin-mocha
     volumes:
       - ./qbittorrent:/config
       - /torrent:/torrent
@@ -47,6 +48,8 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Sao_Paulo
+      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:sonarr
+      - TP_COMMUNITY_THEME=catppuccin-mocha
     volumes:
       - ./sonarr:/config
       - /torrent:/torrent
@@ -65,6 +68,8 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Sao_Paulo
+      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:radarr
+      - TP_COMMUNITY_THEME=catppuccin-mocha
     volumes:
       - ./radarr:/config
       - /torrent:/torrent
@@ -83,6 +88,8 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Sao_Paulo
+      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:prowlarr
+      - TP_COMMUNITY_THEME=catppuccin-mocha
     volumes:
       - ./prowlarr:/config
     ports:
