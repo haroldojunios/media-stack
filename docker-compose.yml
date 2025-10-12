@@ -161,6 +161,21 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
+  flood:
+    image: jesec/flood
+    user: 1000:1001
+    restart: unless-stopped
+    command: --port 9001
+    ports:
+      - 9001:9001
+    environment:
+      - HOME=/config
+      - TZ=America/Sao_Paulo
+    volumes:
+      - ./flood:/config
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
   backup:
     build:
       context: ./backup
