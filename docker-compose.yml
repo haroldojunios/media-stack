@@ -67,6 +67,8 @@ services:
         condition: service_healthy
       qbittorrent:
         condition: service_started
+      prowlarr:
+        condition: service_started
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -89,6 +91,8 @@ services:
       storage:
         condition: service_healthy
       qbittorrent:
+        condition: service_started
+      prowlarr:
         condition: service_started
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
@@ -140,13 +144,15 @@ services:
     restart: unless-stopped
     depends_on:
       - jellyfin
+      - sonarr
+      - radarr
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
   calendarr:
     image: ghcr.io/jordanlambrecht/calendarr:latest
-    restart: "unless-stopped"
     container_name: calendarr
+    restart: "unless-stopped"
     environment:
       USE_DISCORD: "true"
       DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL} # Reference the .env.example for more info
@@ -161,6 +167,8 @@ services:
       SCHEDULE_DAY: 0 # 0 = mon, 6 = sun
     volumes:
       - ./calendarr/logs:/app/logs:rw
+    depends_on:
+      - sonarr
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -172,11 +180,14 @@ services:
       - TZ=America/Sao_Paulo
     volumes:
       - ./renamarr/config.yml:/config/config.yml:ro
+    depends_on:
+      - sonarr
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
   flood:
     image: jesec/flood
+    container_name: flood
     user: 1000:1001
     restart: unless-stopped
     command: --port 9001
@@ -187,6 +198,8 @@ services:
       - TZ=America/Sao_Paulo
     volumes:
       - ./flood:/config
+    depends_on:
+      - qbittorrent
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -206,8 +219,8 @@ services:
     restart: unless-stopped
 
   watchtower:
-    image: containrrr/watchtower:latest
     container_name: watchtower
+    image: containrrr/watchtower:latest
     restart: unless-stopped
     environment:
       - TZ=America/Sao_Paulo
@@ -218,6 +231,7 @@ services:
 
   storage:
     image: busybox:stable
+    container_name: storage
     volumes:
       - /torrent:/torrent
     command: 'sh -c "echo Checking volume...; tail -f /dev/null"'
