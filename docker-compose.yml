@@ -9,6 +9,9 @@ services:
       - ./jellyfin:/config
       - /torrent:/torrent
     restart: unless-stopped
+    depends_on:
+      storage:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -38,6 +41,9 @@ services:
       - "6881:6881" # Torrent TCP
       - "6881:6881/udp" # Torrent UDP
     restart: unless-stopped
+    depends_on:
+      storage:
+        condition: service_healthy
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -57,7 +63,10 @@ services:
       - "8989:8989"
     restart: unless-stopped
     depends_on:
-      - qbittorrent
+      storage:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_started
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -77,7 +86,10 @@ services:
       - "7878:7878"
     restart: unless-stopped
     depends_on:
-      - qbittorrent
+      storage:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_started
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -126,6 +138,8 @@ services:
     volumes:
       - ./jellyseerr:/app/config
     restart: unless-stopped
+    depends_on:
+      - jellyfin
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -181,6 +195,8 @@ services:
       context: ./backup
       dockerfile: ./Dockerfile
     container_name: backup
+    environment:
+      - TZ=America/Sao_Paulo
     volumes:
       - .:/data # Entire media stack folder
       - ./backups:/backups # Local backup storage (excluded from archive)
@@ -199,6 +215,15 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --cleanup --interval 3600
+
+  storage:
+    image: busybox:stable
+    volumes:
+      - /torrent:/torrent
+    command: 'sh -c "echo Checking volume...; tail -f /dev/null"'
+    healthcheck:
+      test: ["CMD-SHELL", 'test -d "/torrent/sonarr" || exit 1']
+      interval: 5s
 
 networks:
   default:
