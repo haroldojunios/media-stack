@@ -98,7 +98,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
+    image: lscr.io/linuxserver/prowlarr:develop-version-2.1.2.5186
     container_name: prowlarr
     environment:
       - PUID=1000
