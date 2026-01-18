@@ -136,9 +136,9 @@ services:
     environment:
       - LOG_LEVEL=debug
       - TZ=America/Sao_Paulo
-      - PORT=5055 #optional
+      - PORT=5050 #optional
     ports:
-      - 5055:5055
+      - 5050:5050
     volumes:
       - ./jellyseerr:/app/config
     restart: unless-stopped
