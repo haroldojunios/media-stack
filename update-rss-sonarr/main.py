@@ -10,6 +10,8 @@ load_dotenv()
 
 TIMEOUT = 120
 
+time.sleep(TIMEOUT)
+
 try:
     BASE_URL = "http://sonarr:8989"
     requests.get(BASE_URL, timeout=2).raise_for_status()
