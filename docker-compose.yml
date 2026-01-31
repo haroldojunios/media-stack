@@ -203,6 +203,28 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
+  webdav-server:
+    container_name: webdav-server
+    image: rclone/rclone
+    command:
+      - "--verbose"
+      - "--addr"
+      - "0.0.0.0:8080"
+      - "--htpasswd"
+      - "/root/htpasswd"
+      - "serve"
+      - "webdav"
+      - "/data"
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    volumes:
+      - ~/.config/rclone/:/root/.config/rclone/:ro
+      - ./webdav-server/htpasswd:/root/htpasswd:ro
+      - ./webdav-server/data:/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
   backup:
     build:
       context: ./backup
@@ -229,6 +251,8 @@ services:
     volumes:
       - ./update-rss-sonarr:/app
       - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - sonarr
     restart: unless-stopped
 
   watchtower:
